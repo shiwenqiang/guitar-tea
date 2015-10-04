@@ -1,5 +1,5 @@
 all:gt
-
+.PHONY:all
 
 # Which compiler
 CC = gcc
@@ -56,10 +56,17 @@ gt: $(GT_OBJECTS)
 $(PWD)/obj/server.o:$(GT_PATH_INCLUDE)/public.h $(GT_PATH_USER)/server.c
 	$(CC) -c -o $(PWD)/obj/server.o $(CFLAGS) -I$(GT_PATH_INCLUDE) $(GT_PATH_USER)/server.c 
 
-.PHONY:clean
-clean:
-	-rm -f $(PWD)/bin/* $(PWD)/obj/*
-	-rm -rf $(PWD)/bin $(PWD)/obj
+
+.PHONY:clean cleanobj cleanbin
+clean:cleanobj cleanbin
+
+cleanobj:
+	-rm -f $(PWD)/obj/*
+	-rm -rf $(PWD)/obj
+
+cleanbin:
+	-rm -f $(PWD)/bin/*
+	-rm -rf $(PWD)/bin
 
 else # else for Check path
 gt:
