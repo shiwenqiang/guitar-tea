@@ -37,12 +37,12 @@ FGC_END = \\e[0m
 # Check path
 ifneq ($(PWD), $(RESERVED_PATH))
 
-GT_PATH_INCLUDE = $(PWD)/include
-GT_PATH_COMMON = $(PWD)/common
-GT_PATH_KERNEL = $(PWD)/kernel
-GT_PATH_USER = $(PWD)/user
+GT_PATH_INCLUDE = $(PWD)/../include
+GT_PATH_COMMON = $(PWD)/../common
+GT_PATH_KERNEL = $(PWD)/../kernel
+GT_PATH_USER = $(PWD)/../user
 
-gt:$(GT_PATH_USER)/server.c
+gt: $(GT_PATH_USER)/server.c
 	mkdir -p $(PWD)/bin
 	$(CC) -o $(PWD)/bin/gt $(CFLAGS) -I$(GT_PATH_INCLUDE) $(GT_PATH_USER)/server.c
 
