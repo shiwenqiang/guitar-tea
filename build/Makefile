@@ -38,7 +38,6 @@ $(shell mkdir -p $(PWD)/bin)
 FGC_BEGIN = \\e[31m
 FGC_END = \\e[0m
 
-
 # Check path
 ifneq ($(PWD), $(RESERVED_PATH))
 
@@ -55,7 +54,6 @@ gt: $(GT_OBJECTS)
 
 $(PWD)/obj/server.o:$(GT_PATH_INCLUDE)/public.h $(GT_PATH_USER)/server.c
 	$(CC) -c -o $(PWD)/obj/server.o $(CFLAGS) -I$(GT_PATH_INCLUDE) $(GT_PATH_USER)/server.c 
-
 
 .PHONY:clean cleanobj cleanbin
 clean:cleanobj cleanbin
