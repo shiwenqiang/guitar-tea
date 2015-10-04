@@ -1,5 +1,6 @@
 all:gt
 
+
 # Which compiler
 CC = gcc
 
@@ -46,8 +47,11 @@ GT_PATH_COMMON = $(PWD)/../common
 GT_PATH_KERNEL = $(PWD)/../kernel
 GT_PATH_USER = $(PWD)/../user
 
-gt: $(PWD)/obj/server.o
-	$(CC) -o $(PWD)/bin/gt $(PWD)/obj/server.o
+# Objects file
+GT_OBJECTS = $(PWD)/obj/server.o
+
+gt: $(GT_OBJECTS)
+	$(CC) -o $(PWD)/bin/gt $(GT_OBJECTS)
 
 $(PWD)/obj/server.o:$(GT_PATH_USER)/server.c
 	$(CC) -c -o $(PWD)/obj/server.o $(CFLAGS) -I$(GT_PATH_INCLUDE) $(GT_PATH_USER)/server.c 
