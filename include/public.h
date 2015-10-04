@@ -11,5 +11,7 @@ typedef struct poller{
     int max_events;
 }poller_t;
 
+#define GT_TRUE (1)
+#define GT_FALSE (0)
 #else
 #endif

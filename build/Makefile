@@ -53,7 +53,7 @@ GT_OBJECTS = $(PWD)/obj/server.o
 gt: $(GT_OBJECTS)
 	$(CC) -o $(PWD)/bin/gt $(GT_OBJECTS)
 
-$(PWD)/obj/server.o:$(GT_PATH_USER)/server.c
+$(PWD)/obj/server.o:$(GT_PATH_INCLUDE)/public.h $(GT_PATH_USER)/server.c
 	$(CC) -c -o $(PWD)/obj/server.o $(CFLAGS) -I$(GT_PATH_INCLUDE) $(GT_PATH_USER)/server.c 
 
 .PHONY:clean
