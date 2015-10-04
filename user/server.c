@@ -7,14 +7,13 @@
 #include <string.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <unistd.h>
 #include <netinet/in.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/epoll.h>
 
 poller_t g_poller = {0};
-#define M 42
-#define ADD(x) (M + x)
 int main(int argc, char *argv[])
 {
     /* init local variables */
@@ -33,7 +32,7 @@ int main(int argc, char *argv[])
     lfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (-1 == lfd)
     {
-        printf("Failed to create socket! errno:%M\n");
+        printf("Failed to create socket! errno:%m\n");
         return -1;
     }
     saddr.sin_family = AF_INET;
@@ -130,7 +129,7 @@ int main(int argc, char *argv[])
                     printf("Peer close!\n");
                     break;
                 }
-                else if (ret = -1)
+                else if (ret == -1)
                 {
                     printf("Read error!\n");
                     break;
