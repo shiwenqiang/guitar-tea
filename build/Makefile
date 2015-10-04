@@ -9,6 +9,10 @@ CFLAGS = -g -Wall -ansi
 # Path
 PWD = $(shell pwd)
 RESERVED_PATH = /
+
+# Make path
+$(shell mkdir -p $(PWD)/obj)
+$(shell mkdir -p $(PWD)/bin)
 # Color for echo which's with -e option
 # \e[30m -- \e[37m 设置前景色
 # \e[30m 将字符的显示颜色改为黑色
@@ -42,14 +46,16 @@ GT_PATH_COMMON = $(PWD)/../common
 GT_PATH_KERNEL = $(PWD)/../kernel
 GT_PATH_USER = $(PWD)/../user
 
-gt: $(GT_PATH_USER)/server.c
-	mkdir -p $(PWD)/bin
-	$(CC) -o $(PWD)/bin/gt $(CFLAGS) -I$(GT_PATH_INCLUDE) $(GT_PATH_USER)/server.c
+gt: $(PWD)/obj/server.o
+	$(CC) -o $(PWD)/bin/gt $(PWD)/obj/server.o
+
+$(PWD)/obj/server.o:$(GT_PATH_USER)/server.c
+	$(CC) -c -o $(PWD)/obj/server.o $(CFLAGS) -I$(GT_PATH_INCLUDE) $(GT_PATH_USER)/server.c 
 
 .PHONY:clean
 clean:
-	-rm -f $(PWD)/bin/*
-	-rm -rf $(PWD)/bin
+	-rm -f $(PWD)/bin/* $(PWD)/obj/*
+	-rm -rf $(PWD)/bin $(PWD)/obj
 
 else # else for Check path
 gt:
