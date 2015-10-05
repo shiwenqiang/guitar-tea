@@ -14,6 +14,7 @@ RESERVED_PATH = /
 # Make path
 $(shell mkdir -p $(PWD)/obj)
 $(shell mkdir -p $(PWD)/bin)
+$(shell mkdir -p $(PWD)/dep)
 # Color for echo which's with -e option
 # \e[30m -- \e[37m 设置前景色
 # \e[30m 将字符的显示颜色改为黑色
@@ -58,21 +59,25 @@ gt: $(GT_OBJECTS)
 
 $(GT_OBJECTS):$(GT_ORG_OBJECTS)
 	cp $< $(PWD)/obj
-#	mv $< $(PWD)/obj
+#	mv $< $(PWD)/obj	
 
 $(GT_ORG_OBJECTS):%.o:%.c
 	$(CC) -c $(CFLAGS) -I$(GT_PATH_INCLUDE) $< -o $@
 
-.PHONY:clean cleanobj cleanbin
-clean:cleanobj cleanbin
+source = $(wildcard $(GT_PATH_USER)/*.c)
+include $(source:.c=.d)
+%.d: %.c
+	set -e; \
+	$(CC) -MM $(CFLAGS) -I$(GT_PATH_INCLUDE) $< > $@.$$$$; \
+	sed 's,\($(subst $(GT_PATH_USER)/,,$*)\)\.o[ :]*,\1.o \1.d: ,g' < $@.$$$$ > $@; \
+	cat $@
+#	rm -f $@.$$$$
 
-cleanobj:
-	-rm -f $(PWD)/obj/*
-	-rm -rf $(PWD)/obj
 
-cleanbin:
-	-rm -f $(PWD)/bin/*
-	-rm -rf $(PWD)/bin
+.PHONY:clean
+clean:
+	-rm -f $(GT_PATH_USER)/*.o $(GT_PATH_USER)/*.d* $(PWD)/obj/* $(PWD)/dep/* $(PWD)/bin/* 
+	-rm -rf $(PWD)/bin $(PWD)/obj $(PWD)/dep
 
 else # else for Check path
 
