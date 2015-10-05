@@ -48,12 +48,19 @@ GT_PATH_USER = $(PWD)/../user
 
 # Objects file
 GT_OBJECTS = $(PWD)/obj/server.o
+GT_ORG_OBJECTS = $(GT_PATH_USER)/server.o
 
 gt: $(GT_OBJECTS)
 	$(CC) -o $(PWD)/bin/gt $(GT_OBJECTS)
 
-$(PWD)/obj/server.o:$(GT_PATH_INCLUDE)/public.h $(GT_PATH_USER)/server.c
-	$(CC) -c -o $(PWD)/obj/server.o $(CFLAGS) -I$(GT_PATH_INCLUDE) $(GT_PATH_USER)/server.c 
+#$(PWD)/obj/server.o:$(GT_PATH_INCLUDE)/public.h $(GT_PATH_USER)/server.c
+#	$(CC) -c -o $(PWD)/obj/server.o $(CFLAGS) -I$(GT_PATH_INCLUDE) $(GT_PATH_USER)/server.c 
+
+$(GT_OBJECTS):$(GT_ORG_OBJECTS)
+	mv $< $(PWD)/obj
+
+$(GT_ORG_OBJECTS):%.o:%.c
+	$(CC) -c $(CFLAGS) -I$(GT_PATH_INCLUDE) $< -o $@
 
 .PHONY:clean cleanobj cleanbin
 clean:cleanobj cleanbin
@@ -67,10 +74,12 @@ cleanbin:
 	-rm -rf $(PWD)/bin
 
 else # else for Check path
+
 gt:
 	@echo -e $(FGC_BEGIN) "Warning: cannot make file for '$(PWD)'" $(FGC_END)
 
 .PHONY:clean
 clean:
 	@echo -e $(FGC_BEGIN) "Warning: cannot make clean for '$(PWD)'" $(FGC_END)
+
 endif

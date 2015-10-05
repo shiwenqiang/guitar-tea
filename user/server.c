@@ -14,6 +14,7 @@
 #include <sys/epoll.h>
 
 poller_t g_poller = {0};
+
 int main(int argc, char *argv[])
 {
     /* init local variables */
