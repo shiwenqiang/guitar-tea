@@ -59,7 +59,7 @@ gt: $(GT_OBJECTS)
 
 $(GT_OBJECTS):$(GT_ORG_OBJECTS)
 	cp $< $(PWD)/obj
-#	mv $< $(PWD)/obj	
+#	mv $< $(PWD)/obj
 
 $(GT_ORG_OBJECTS):%.o:%.c
 	$(CC) -c $(CFLAGS) -I$(GT_PATH_INCLUDE) $< -o $@
