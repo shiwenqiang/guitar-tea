@@ -57,7 +57,8 @@ gt: $(GT_OBJECTS)
 #	$(CC) -c -o $(PWD)/obj/server.o $(CFLAGS) -I$(GT_PATH_INCLUDE) $(GT_PATH_USER)/server.c 
 
 $(GT_OBJECTS):$(GT_ORG_OBJECTS)
-	mv $< $(PWD)/obj
+	cp $< $(PWD)/obj
+#	mv $< $(PWD)/obj
 
 $(GT_ORG_OBJECTS):%.o:%.c
 	$(CC) -c $(CFLAGS) -I$(GT_PATH_INCLUDE) $< -o $@
