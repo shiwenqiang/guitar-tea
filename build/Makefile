@@ -1,91 +1,72 @@
-all:gt
-.PHONY:all
+#################################################
+#	A Makefile For Guitar&Tea
+#	Author	: shiwenqiang
+#	Date	: Oct 6 2015
+#	Version	: v0.0.1
+#################################################
 
-# Which compiler
+#------------------------------------------------
+#	Define compiler
 CC = gcc
 
-# Options for compiler
 CFLAGS = -g -Wall -ansi
 
-# Path
-PWD = $(shell pwd)
+CURRENT_PATH = $(shell pwd)
 RESERVED_PATH = /
 
-# Make path
-$(shell mkdir -p $(PWD)/obj)
-$(shell mkdir -p $(PWD)/bin)
-$(shell mkdir -p $(PWD)/dep)
-# Color for echo which's with -e option
-# \e[30m -- \e[37m 设置前景色
-# \e[30m 将字符的显示颜色改为黑色
-# \e[31m 将字符的显示颜色改为红色
-# \e[32m 将字符的显示颜色改为绿色
-# \e[33m 将字符的显示颜色改为淡红色
-# \e[34m 将字符的显示颜色改为蓝色
-# \e[35m 将字符的显示颜色改为紫色
-# \e[36m 将字符的显示颜色改为淡蓝色
-# \e[37m 将字符的显示颜色改为灰色
-# 
-# \e[40m -- \e[47m 设置背景色
-# \e[40m 将背景色设置为黑色
-# \e[41m 将背景色设置为红色
-# \e[42m 将背景色设置为绿色
-# \e[43m 将背景色设置为淡红色
-# \e[44m 将背景色设置为蓝色
-# \e[45m 将背景色设置为紫色
-# \e[46m 将背景色设置为淡蓝色
-# \e[47m 将背景色设置为灰色
+#	Get src *.c list
+sources := $(wildcard $(CURRENT_PATH)/../user/*.c)
 
-FGC_BEGIN = \\e[31m
-FGC_END = \\e[0m
+#	Get obj *.o list
+objects := $(patsubst %.c,%.o,$(sources))
 
-# Check path
-ifneq ($(PWD), $(RESERVED_PATH))
+#	Get dep *.d list
+dependence := $(objects:.o=.d)
 
-GT_PATH_INCLUDE = $(PWD)/../include
-GT_PATH_COMMON = $(PWD)/../common
-GT_PATH_KERNEL = $(PWD)/../kernel
-GT_PATH_USER = $(PWD)/../user
+#	Define Macros
 
-# Objects file
-GT_OBJECTS = $(PWD)/obj/server.o
-GT_ORG_OBJECTS = $(GT_PATH_USER)/server.o
+GT_PATH_INCLUDE = $(CURRENT_PATH)/../include
+GT_PATH_COMMON = $(CURRENT_PATH)/../common
+GT_PATH_KERNEL = $(CURRENT_PATH)/../kernel
+GT_PATH_USER = $(CURRENT_PATH)/../user
+#------------------------------------------------
+#	Prepare Dir
+$(shell mkdir -p $(CURRENT_PATH)/bin)
+$(shell mkdir -p $(CURRENT_PATH)/obj)
+$(shell mkdir -p $(CURRENT_PATH)/dep)
 
-gt: $(GT_OBJECTS)
-	$(CC) -o $(PWD)/bin/gt $(GT_OBJECTS)
+#------------------------------------------------
+#	Define Target & Dependency-relationship
+all: gt
+.PHONY: all
 
-#$(PWD)/obj/server.o:$(GT_PATH_INCLUDE)/public.h $(GT_PATH_USER)/server.c
-#	$(CC) -c -o $(PWD)/obj/server.o $(CFLAGS) -I$(GT_PATH_INCLUDE) $(GT_PATH_USER)/server.c 
+gt: $(objects)
+	$(CC) $(CFLAGS) $(objects) -o $(CURRENT_PATH)/bin/gt
 
-$(GT_OBJECTS):$(GT_ORG_OBJECTS)
-	cp $< $(PWD)/obj
-#	mv $< $(PWD)/obj	
+%.o: %.c
+	$(CC) $(CFLAGS) -I$(GT_PATH_INCLUDE) -c $< -o $@
 
-$(GT_ORG_OBJECTS):%.o:%.c
-	$(CC) -c $(CFLAGS) -I$(GT_PATH_INCLUDE) $< -o $@
+#------------------------------------------------
+#	Include dependence file *.d
+include $(dependence)
 
-source = $(wildcard $(GT_PATH_USER)/*.c)
-include $(source:.c=.d)
+#	Define func of generate dependence-relationship file *.d
+define gen_dep
+@set -e; rm -f $@;\
+$(CC) -MM $(CFLAGS) -I$(GT_PATH_INCLUDE) $< > $@.$$$$;\
+sed 's,\($(subst $(GT_PATH_USER)/,,$*)\)\.o[ :]*,$*.o $@: ,g' < $@.$$$$ > $@;\
+rm -f $@.$$$$
+endef
+
 %.d: %.c
-	set -e; \
-	$(CC) -MM $(CFLAGS) -I$(GT_PATH_INCLUDE) $< > $@.$$$$; \
-	sed 's,\($(subst $(GT_PATH_USER)/,,$*)\)\.o[ :]*,\1.o \1.d: ,g' < $@.$$$$ > $@; \
-	cat $@
-#	rm -f $@.$$$$
+	$(gen_dep)
 
-
-.PHONY:clean
+.PHONY: clean
 clean:
-	-rm -f $(GT_PATH_USER)/*.o $(GT_PATH_USER)/*.d* $(PWD)/obj/* $(PWD)/dep/* $(PWD)/bin/* 
-	-rm -rf $(PWD)/bin $(PWD)/obj $(PWD)/dep
+	-rm -f all $(objects) $(dependence)
 
-else # else for Check path
-
-gt:
-	@echo -e $(FGC_BEGIN) "Warning: cannot make file for '$(PWD)'" $(FGC_END)
-
-.PHONY:clean
-clean:
-	@echo -e $(FGC_BEGIN) "Warning: cannot make clean for '$(PWD)'" $(FGC_END)
-
-endif
+echo:
+	@echo sources=$(sources)
+	@echo objects=$(objects)
+	@echo dependence=$(dependence)
+	@echo CFLAGS=$(CFLAGS)

@@ -11,6 +11,12 @@ typedef struct poller{
     int max_events;
 }poller_t;
 
+typedef struct net_conn{
+    int sfd;
+    int cnt;
+    struct net_conn *next;
+}net_conn_t;
+
 #define GT_TRUE (1)
 #define GT_FALSE (0)
 
