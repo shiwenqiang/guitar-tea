@@ -19,6 +19,12 @@
 /* Debug Section */
 
 /* Include Files Section */
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdarg.h>
+#include <unistd.h>
+#include <sys/time.h>
 
 /* Basic Type Section */
 /* Signed */
