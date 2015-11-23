@@ -15,20 +15,24 @@
 #include "gt_pub.h"
 #include "gt_log.h"
 
-
-char g_log_level_str[GT_LOG_LEVEL_MAX] = {
+char *g_log_level_str[GT_LOG_LEVEL_MAX] = {
     "INFO",
     "WARN",
     "ERROR",
     "DEBUG",
-    "UNKOWN"
 };
 
+
+#if 0
+struct tm *localtime_r(const time_t *timep, struct tm *result);
+int snprintf(char *str, size_t size, const char *format, ...);
+int vsnprintf(char *str, size_t size, const char *format, va_list ap);
+#endif
 void gt_log_print(gt_mid_e mid, gt_int32_t fd, gt_int32_t log_level, const char *format, ...)
 {
     char buf[GT_LOG_BUF_MAX_LEN] = {0};
-    struct timeval tv = {0};
-    struct tm tm = {0};
+    struct timeval tv;
+    struct tm tm;
     
     /* Fill buffer */
     if (-1 == gettimeofday(&tv, (struct timezone *)NULL))
@@ -36,19 +40,16 @@ void gt_log_print(gt_mid_e mid, gt_int32_t fd, gt_int32_t log_level, const char 
         return;
     }
     
-    if (NULL == localtime_r(&tv.tv_sec, &tm))
-    {
-        return;
-    }
+    localtime_r(&(tv.tv_sec), &tm);
 
-    gt_int32_t ret_time_len = strftime(buf, GT_LOG_BUF_MAX_LEN - 1, "%Y %T", &tm);
+    gt_int32_t ret_time_len = strftime(buf, GT_LOG_BUF_MAX_LEN - 1, "%F %T ", &tm);
     if (ret_time_len < 0)
     {
         return;
     }
 
 
-    gt_int32_t ret_level_len = snprintf(buf + ret_time_len, GT_LOG_BUF_MAX_LEN - ret_time_len - 1, "[%s]", g_log_level_str[log_level]);
+    gt_int32_t ret_level_len = snprintf(buf + ret_time_len, GT_LOG_BUF_MAX_LEN - ret_time_len - 1, "[%s] ", g_log_level_str[log_level]);
     if (ret_level_len < 0)
     {
         return;
@@ -75,18 +76,17 @@ void gt_log_print(gt_mid_e mid, gt_int32_t fd, gt_int32_t log_level, const char 
         log_length = ret_time_len + ret_level_len + ret_log_len - 1;
     }
 
-    gt_int32_t ret_end_len = snprintf(buf + log_length, GT_LOG_BUF_MAX_LEN - log_length - 1, "/n");
+    gt_int32_t ret_end_len = snprintf(buf + log_length, GT_LOG_BUF_MAX_LEN - log_length - 1, "\n");
     if (ret_end_len < 0)
     {
         return;
     }
     
-    ret_written_len = write(fd, buf, GT_LOG_BUF_MAX_LEN);
+    gt_int32_t ret_written_len = write(fd, buf, GT_LOG_BUF_MAX_LEN);
     if (ret_written_len < 0)
     {
         return;
     }
     
     return;
-    
 }

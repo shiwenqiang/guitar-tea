@@ -9,13 +9,13 @@
 #	Define compiler
 CC = gcc
 
-CFLAGS = -g -Wall -ansi
+CFLAGS = -g -Wall
 
 CURRENT_PATH = $(shell pwd)
 RESERVED_PATH = /
 
 #	Get src *.c list
-sources := $(wildcard $(CURRENT_PATH)/../user/*.c)
+sources := $(wildcard $(CURRENT_PATH)/../user/core/*.c)
 
 #	Get obj *.o list
 objects := $(patsubst %.c,%.o,$(sources))
@@ -28,12 +28,12 @@ dependence := $(objects:.o=.d)
 GT_PATH_INCLUDE = $(CURRENT_PATH)/../include
 GT_PATH_COMMON = $(CURRENT_PATH)/../common
 GT_PATH_KERNEL = $(CURRENT_PATH)/../kernel
-GT_PATH_USER = $(CURRENT_PATH)/../user
+GT_PATH_USER = $(CURRENT_PATH)/../user/core
 #------------------------------------------------
 #	Prepare Dir
 $(shell mkdir -p $(CURRENT_PATH)/bin)
 $(shell mkdir -p $(CURRENT_PATH)/obj)
-$(shell mkdir -p $(CURRENT_PATH)/dep)
+$(shell mkdir -p $(CURRENT_PATH)/dep)	
 
 #------------------------------------------------
 #	Define Target & Dependency-relationship
@@ -42,7 +42,6 @@ all: gt
 
 gt: $(objects)
 	$(CC) $(CFLAGS) $(objects) -o $(CURRENT_PATH)/bin/gt
-
 %.o: %.c
 	$(CC) $(CFLAGS) -I$(GT_PATH_INCLUDE) -c $< -o $@
 
@@ -64,7 +63,7 @@ endef
 .PHONY: clean
 clean:
 	-rm -f all $(objects) $(dependence)
-
+	-rm -f $(GT_PATH_USER)/*.d $(GT_PATH_USER)/*.o
 echo:
 	@echo sources=$(sources)
 	@echo objects=$(objects)

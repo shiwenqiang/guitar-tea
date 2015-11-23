@@ -26,11 +26,6 @@
 #define GT_STD_OUTPUT           (1)
 #define GT_STD_ERROR            (2)
 
-#define GT_LOG_LEVEL_INFO       (0)
-#define GT_LOG_LEVEL_WARN       (1)
-#define GT_LOG_LEVEL_ERROR      (2)
-#define GT_LOG_LEVEL_DEBUG      (3)
-
 #define GT_LOG_BUF_MAX_LEN      (1024)
 
 /* Structure Define Section */
@@ -49,13 +44,13 @@ void gt_log_print(gt_mid_e mid, gt_int32_t fd, gt_int32_t level, const char *for
 
 
 #define GT_STD_INFO_LOG(mid, fmt, arg...) \
-    gt_log_print(mid, GT_STD_OUTPUT, GT_LOG_LEVEL_INFO, "%s:%d" fmt, __FUNCTION__, __LINE__, ##arg);
+    gt_log_print(mid, GT_STD_OUTPUT, GT_LOG_LEVEL_INFO, "[%s:%d] " fmt, __FUNCTION__, __LINE__, ##arg);
 #define GT_STD_WARN_LOG(mid, fmt, arg...) \
-    gt_log_print(mid, GT_STD_OUTPUT, GT_LOG_LEVEL_WARN, "%s:%d" fmt, __FUNCTION__, __LINE__, ##arg);
+    gt_log_print(mid, GT_STD_OUTPUT, GT_LOG_LEVEL_WARN, "[%s:%d] " fmt, __FUNCTION__, __LINE__, ##arg);
 #define GT_STD_ERROR_LOG(mid, fmt, arg...)\
-    gt_log_print(mid, GT_STD_OUTPUT, GT_LOG_LEVEL_ERROR, "%s:%d" fmt, __FUNCTION__, __LINE__, ##arg);
+    gt_log_print(mid, GT_STD_OUTPUT, GT_LOG_LEVEL_ERROR, "[%s:%d] " fmt, __FUNCTION__, __LINE__, ##arg);
 #define GT_STD_DEBUG_LOG(mid, fmt, arg...)\
-    gt_log_print(mid, GT_STD_OUTPUT, GT_LOG_LEVEL_DEBUG, "%s:%d" fmt, __FUNCTION__, __LINE__, ##arg);
+    gt_log_print(mid, GT_STD_OUTPUT, GT_LOG_LEVEL_DEBUG, "[%s:%d] " fmt, __FUNCTION__, __LINE__, ##arg);
 
 
 #endif /*__GT_LOG_H__*/
