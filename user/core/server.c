@@ -27,8 +27,7 @@ int main(int argc, char *argv[])
     memset(&caddr, 0x0, sizeof(caddr));
     memset(&ev, 0x0, sizeof(ev));
     memset(events, 0x0, sizeof(events));
-    GT_STD_INFO_LOG(GT_MID_CORE, "Start listenning...");
-
+    GT_STD_INFO_LOG(GT_MID_CORE, "Start listening...");
     /* create listen and accept */
     lfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (-1 == lfd)

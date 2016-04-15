@@ -40,7 +40,7 @@ typedef enum gt_log_level
 }gt_log_level_e;
 
 /* Prototype Declare Section */
-void gt_log_print(gt_mid_e mid, gt_int32_t fd, gt_int32_t level, const char *format, ...);
+void gt_log_print(gt_mid_e mid, gt_int32_t fd, gt_int32_t level, const char *format, ...)__attribute__((format(printf, 4, 5)));
 
 
 #define GT_STD_INFO_LOG(mid, fmt, arg...) \
