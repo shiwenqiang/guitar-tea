@@ -51,7 +51,6 @@ void gt_log_print(gt_mid_e mid, gt_int32_t fd, gt_int32_t log_level, const char 
         return;
     }
 
-
     gt_int32_t ret_level_len = snprintf(buf + ret_time_len, GT_LOG_BUF_MAX_LEN - ret_time_len - 1, "[%s] ", g_log_level_str[log_level]);
     if (ret_level_len < 0)
     {
