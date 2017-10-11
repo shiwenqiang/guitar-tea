@@ -1,15 +1,23 @@
-#################################################
-#	A Makefile For Guitar&Tea
-#	Author	: shiwenqiang
-#	Date	: Oct 6 2015
-#	Version	: v0.0.1
-#################################################
+#**************************************************************
+#*          Copyright 2015. Guitar&Tea Tech. Co., Ltd.
+#*                     All Rights Reseved
+#*
+#* File     :Makefile
+#* Module   :make Compile config file
+#* Date     :2017/10/11
+#* Author   :shiwenqiang
+#* Brief    :Makefile.
+#*
+#*------------------------Revision History----------------------
+#*  No. Version Date        Mender        Desc.
+#*  1   V0.01   2017-10-11  shiwenqiang   Original Version.
+#**************************************************************
 
 #------------------------------------------------
 #	Define compiler
 CC = gcc
 
-CFLAGS = -g -Wall
+CFLAGS = -g -Wall -pthread
 
 CURRENT_PATH = $(shell pwd)
 RESERVED_PATH = /
@@ -33,7 +41,7 @@ GT_PATH_USER = $(CURRENT_PATH)/../user/core
 #	Prepare Dir
 $(shell mkdir -p $(CURRENT_PATH)/bin)
 $(shell mkdir -p $(CURRENT_PATH)/obj)
-$(shell mkdir -p $(CURRENT_PATH)/dep)	
+$(shell mkdir -p $(CURRENT_PATH)/dep)
 
 #------------------------------------------------
 #	Define Target & Dependency-relationship
