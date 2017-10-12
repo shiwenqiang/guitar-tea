@@ -31,7 +31,7 @@ struct tm *localtime_r(const time_t *timep, struct tm *result);
 int snprintf(char *str, size_t size, const char *format, ...);
 int vsnprintf(char *str, size_t size, const char *format, va_list ap);
 #endif
-void gt_log_print(gt_mid_e mid, gt_int32_t fd, gt_int32_t log_level, const char *format, ...)
+void gt_log_print(gt_mod_type_e mod, gt_int32_t fd, gt_int32_t log_level, const char *format, ...)
 {
     char buf[GT_LOG_BUF_MAX_LEN] = {0};
     struct timeval tv;

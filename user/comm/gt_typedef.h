@@ -9,7 +9,7 @@
  * Brief    :Implementation the log.
  *
  *------------------------Revision History---------------------
- *  No. Version Date        Mender        Desc.   
+ *  No. Version Date        Mender        Desc.
  *  1   V0.01   2015-11-22  shiwenqiang   Basic Data Type Orig-
  *                                         inal Version.
  **************************************************************/
@@ -63,6 +63,7 @@ typedef uint32_t            gt_uint_t;
 #define GT_OK               (0)
 #define GT_ERROR            (-1)
 
+#define DIM(__arr)  (sizeof(__arr)/sizeof(__arr[0]))
 
 /* Structure Define Section */
 

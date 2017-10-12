@@ -2,26 +2,19 @@
  *          Copyright 2015. Guitar&Tea Tech. Co., Ltd.
  *                     All Rights Reseved
  *
- * File     :gt_log.c
- * Module   :Log Engine
- * Date     :2015/11/22
+ * File     :gt_memory.c
+ * Module   :Memory Engine
+ * Date     :2017/10/11
  * Author   :shiwenqiang
- * Brief    :Implementation the log.
+ * Brief    :Implementation the memory.
  *
  *------------------------Revision History----------------------
  *  No. Version Date        Mender        Desc.
- *  1   V0.01   2015-11-22  shiwenqiang   Original Version.
+ *  1   V0.01   2017-10-11  shiwenqiang   Original Version.
  **************************************************************/
-#ifndef __GT_MODULE_H__
-#define __GT_MODULE_H__
+/* USER INCLUDE */
+#include "gt_pub.h"
+#include "gt_memory.h"
 
-typedef enum gt_mod_type
-{
-    GT_MOD_CORE,
-    GT_MOD_MEM,
-    GT_MOD_NET,
-    GT_MOD_TEST,
-    GT_MOD_MAX,
-}gt_mod_type_e;
-
-#endif /* __GT_MODULE_H__ */
+/* STDLIBC INCLUDE */
+#include <malloc.h>

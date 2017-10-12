@@ -27,10 +27,53 @@
 #include <sys/epoll.h>
 #include <arpa/inet.h>
 
-poller_t g_poller = {0};
-
 uint32_t g_gt_server_ip = 0;
 uint16_t g_gt_server_port = 0;
+
+int32_t gt_create_pipefd(int32_t pipefd[2])
+{
+    int32_t ret = socketpair(AF_UNIX, SOCK_STREAM, 0, pipefd);
+    if (GT_OK != ret)
+    {
+        int32_t errnum = errno;
+        GT_ERROR_LOG(GT_MOD_CORE, "Failed to create socketpair pipefd! errno:%d, %s", errnum, strerror(errnum));
+        return ret;
+    }
+    return GT_OK;
+}
+
+int32_t gt_set_nonblock(int32_t fd)
+{
+    int32_t ret = GT_OK;
+    int32_t flag = fcntl(fd, F_GETFL);
+    ret = fcntl(fd, F_SETFL, flag | O_NONBLOCK);
+    if (GT_OK != ret)
+    {
+        int32_t errnum = errno;
+        GT_ERROR_LOG(GT_MOD_CORE, "Failed to set fd[%d] to nonblock! errno:%d, %s", fd, errnum, strerror(errnum));
+        return ret;
+    }
+    return GT_OK;
+}
+
+int32_t gt_set_cloexec(int32_t fd)
+{
+    int32_t ret = GT_OK;
+    int32_t flag = fcntl(fd, F_GETFD);
+    ret = fcntl(fd, F_SETFD, flag | FD_CLOEXEC);
+    if (GT_OK != ret)
+    {
+        int32_t errnum = errno;
+        GT_ERROR_LOG(GT_MOD_CORE, "Failed to set fd[%d] to close-on-exec! errno:%d, %s", fd, errnum, strerror(errnum));
+        return ret;
+    }
+    return GT_OK;
+}
+
+#if 0
+poller_t g_poller = {0};
+
+
 
 int gt_network(int argc, char *argv[])
 {
@@ -49,20 +92,20 @@ int gt_network(int argc, char *argv[])
     /* Parse Input arguments */
     if (argc < 3)
     {
-        GT_ERROR_LOG(GT_MID_CORE, "Invalid Parameters. Usage: %s [ip] [port]", argv[0]);
+        GT_ERROR_LOG(GT_MOD_CORE, "Invalid Parameters. Usage: %s [ip] [port]", argv[0]);
         return GT_ERROR;
     }
 
     const char *ip = argv[0];
     int32_t port = atoi(argv[2]);
 
-    GT_INFO_LOG(GT_MID_CORE, "Start listenning...");
+    GT_INFO_LOG(GT_MOD_CORE, "Start listenning...");
     /* create listen and accept */
     lfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (0 > lfd)
     {
         int32_t tmp_errno = errno;
-        GT_ERROR_LOG(GT_MID_CORE, "Failed to create socket! errno:%d, %s", tmp_errno, strerror(tmp_errno));
+        GT_ERROR_LOG(GT_MOD_CORE, "Failed to create socket! errno:%d, %s", tmp_errno, strerror(tmp_errno));
         return GT_ERROR;
     }
     saddr.sin_family = AF_INET;
@@ -71,7 +114,7 @@ int gt_network(int argc, char *argv[])
     if (-1 == bind(lfd, (struct sockaddr *)&saddr, sizeof(saddr)))
     {
         int32_t tmp_errno = errno;
-        GT_ERROR_LOG(GT_MID_CORE, "Failed to bind ip and port to lfd[%d]! errno:%d, %s", lfd, tmp_errno, strerror(tmp_errno));
+        GT_ERROR_LOG(GT_MOD_CORE, "Failed to bind ip and port to lfd[%d]! errno:%d, %s", lfd, tmp_errno, strerror(tmp_errno));
         close(lfd);
         return GT_ERROR;
     }
@@ -79,7 +122,7 @@ int gt_network(int argc, char *argv[])
     if (-1 == listen(lfd, MAX_EVENTS))
     {
         int32_t tmp_errno = errno;
-        GT_ERROR_LOG(GT_MID_CORE, "Failed to listen ip and port on lfd[%d]! errno:%d, %s", lfd, tmp_errno, strerror(tmp_errno));
+        GT_ERROR_LOG(GT_MOD_CORE, "Failed to listen ip and port on lfd[%d]! errno:%d, %s", lfd, tmp_errno, strerror(tmp_errno));
         close(lfd);
         return -1;
     }
@@ -89,7 +132,7 @@ int gt_network(int argc, char *argv[])
     if (-1 == cfd)
     {
         int32_t tmp_errno = errno;
-        GT_ERROR_LOG(GT_MID_CORE, "Failed to accept new conn on lfd[%d]! errno:%d, %s", lfd, tmp_errno, strerror(tmp_errno));
+        GT_ERROR_LOG(GT_MOD_CORE, "Failed to accept new conn on lfd[%d]! errno:%d, %s", lfd, tmp_errno, strerror(tmp_errno));
         close(lfd);
         return -1;
     }
@@ -98,7 +141,7 @@ int gt_network(int argc, char *argv[])
     if (-1 == setsockopt(cfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)))
     {
         int32_t tmp_errno = errno;
-        GT_ERROR_LOG(GT_MID_CORE, "Failed to set socketopt! errno:%d, %s", tmp_errno, strerror(tmp_errno));
+        GT_ERROR_LOG(GT_MOD_CORE, "Failed to set socketopt! errno:%d, %s", tmp_errno, strerror(tmp_errno));
         close(lfd);
         lfd = -1;
         close(cfd);
@@ -111,7 +154,7 @@ int gt_network(int argc, char *argv[])
     if (-1 == fcntl(cfd, F_SETFL, flags))
     {
         int32_t tmp_errno = errno;
-        GT_ERROR_LOG(GT_MID_CORE, "Failed to set cfd[%d]! errno:%d, %s", cfd, tmp_errno, strerror(tmp_errno));
+        GT_ERROR_LOG(GT_MOD_CORE, "Failed to set cfd[%d]! errno:%d, %s", cfd, tmp_errno, strerror(tmp_errno));
         close(lfd);
         lfd = -1;
         close(cfd);
@@ -119,13 +162,13 @@ int gt_network(int argc, char *argv[])
         return -1;
     }
 
-    GT_INFO_LOG(GT_MID_CORE, "Connection form IP[%#x], PORT[%d]", ntohl(caddr.sin_addr.s_addr), ntohs(caddr.sin_port));
+    GT_INFO_LOG(GT_MOD_CORE, "Connection form IP[%#x], PORT[%d]", ntohl(caddr.sin_addr.s_addr), ntohs(caddr.sin_port));
     /* init epoll */
     epfd = epoll_create(MAX_EVENTS);
     if (-1 == epfd)
     {
         int32_t tmp_errno = errno;
-        GT_ERROR_LOG(GT_MID_CORE, "Failed to create epfd. errno:%d, %s", tmp_errno, strerror(tmp_errno));
+        GT_ERROR_LOG(GT_MOD_CORE, "Failed to create epfd. errno:%d, %s", tmp_errno, strerror(tmp_errno));
         close(cfd);
         cfd = -1;
         close(lfd);
@@ -140,7 +183,7 @@ int gt_network(int argc, char *argv[])
     if (-1 == epoll_ctl(epfd, EPOLL_CTL_ADD, cfd, &ev))
     {
         int32_t tmp_errno = errno;
-        GT_ERROR_LOG(GT_MID_CORE, "Failed to add EPOLLIN to cfd[%d], errno:%d, %s", cfd, tmp_errno, strerror(tmp_errno));
+        GT_ERROR_LOG(GT_MOD_CORE, "Failed to add EPOLLIN to cfd[%d], errno:%d, %s", cfd, tmp_errno, strerror(tmp_errno));
         close(epfd);
         epfd = -1;
         close(cfd);
@@ -167,13 +210,13 @@ int gt_network(int argc, char *argv[])
                 if (ret == 0)
                 {
                     int32_t tmp_errno = errno;
-                    GT_ERROR_LOG(GT_MID_CORE, "Peer close! errno:%d, %s", tmp_errno, strerror(tmp_errno));
+                    GT_ERROR_LOG(GT_MOD_CORE, "Peer close! errno:%d, %s", tmp_errno, strerror(tmp_errno));
                     goto out;
                 }
                 else if (ret == -1)
                 {
                     int32_t tmp_errno = errno;
-                    GT_ERROR_LOG(GT_MID_CORE, "Read error! errno:%d, %s", tmp_errno, strerror(tmp_errno));
+                    GT_ERROR_LOG(GT_MOD_CORE, "Read error! errno:%d, %s", tmp_errno, strerror(tmp_errno));
                     goto out;
                 }
                 else if ((EAGAIN == ret) && (EWOULDBLOCK == ret))
@@ -186,7 +229,7 @@ int gt_network(int argc, char *argv[])
                     //if (pos >= 15)
                     {
                         buf[ret] = '\0';
-                        GT_INFO_LOG(GT_MID_CORE, "%s", buf);
+                        GT_INFO_LOG(GT_MOD_CORE, "%s", buf);
                         //pos = 0;
                     }
                 }
@@ -200,3 +243,4 @@ out:
     close(lfd);
     return 0;
 }
+#endif

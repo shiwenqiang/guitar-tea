@@ -16,7 +16,9 @@
 #include "public.h"
 #include "gt_pub.h"
 #include "gt_log.h"
+#include "gt_signal.h"
 #include "gt_worker.h"
+#include "gt_memory.h"
 
 /* STDLIBC INCLUDE */
 #include <stdio.h>
@@ -26,6 +28,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <arpa/inet.h>
+
 extern uint32_t g_gt_server_ip;
 extern uint16_t g_gt_server_port;
 
@@ -33,14 +36,14 @@ int32_t gt_parse_parameters(int argc, char *argv[])
 {
     if (argc < 3)
     {
-        GT_ERROR_LOG(GT_MID_CORE, "Invalid Parameters. Usage: %s [ip] [port]", argv[0]);
+        GT_ERROR_LOG(GT_MOD_CORE, "Invalid Parameters. Usage: %s [ip] [port]", argv[0]);
         return GT_ERROR;
     }
 
     struct in_addr addr;
     if (0 == inet_aton(argv[1], &addr))
     {
-        GT_ERROR_LOG(GT_MID_CORE, "Invalid ip[%s]. Usage: %s [ip] [port]", argv[1], argv[0]);
+        GT_ERROR_LOG(GT_MOD_CORE, "Invalid ip[%s]. Usage: %s [ip] [port]", argv[1], argv[0]);
         return GT_ERROR;
     }
 
@@ -102,11 +105,17 @@ int32_t gt_init_system(void)
     /* Memory */
     /* Logging */
     /* Signal */
+    ret = gt_signals_register();
+    if (GT_OK != ret)
+    {
+        GT_ERROR_LOG(GT_MOD_CORE, "Failed to register signals!");
+        return ret;
+    }
     /* pthread */
     ret = gt_create_pthread();
     if (GT_OK != ret)
     {
-        GT_ERROR_LOG(GT_MID_CORE, "Failed to create pthread!");
+        GT_ERROR_LOG(GT_MOD_CORE, "Failed to create pthread!");
         return ret;
     }
 
@@ -116,7 +125,7 @@ int32_t gt_init_system(void)
     ret = gt_wakeup_pthread();
     if (GT_OK != ret)
     {
-        GT_ERROR_LOG(GT_MID_CORE, "Failed to wakeup pthread!");
+        GT_ERROR_LOG(GT_MOD_CORE, "Failed to wakeup pthread!");
         return ret;
     }
 
@@ -131,7 +140,7 @@ int32_t gt_do_run(void)
     while(1)
     {
         sleep(1);
-        GT_INFO_LOG(GT_MID_CORE, "This is main, [pthread:%lu, pid:%d]", tid, pid);
+        GT_INFO_LOG(GT_MOD_CORE, "This is main, [pthread:%lu, pid:%d]", tid, pid);
     }
 
     return GT_OK;
@@ -144,7 +153,7 @@ int32_t main(int argc, char *argv[])
     ret = gt_parse_parameters(argc, argv);
     if (GT_OK != ret)
     {
-        GT_ERROR_LOG(GT_MID_CORE, "Failed to parse paramters!");
+        GT_ERROR_LOG(GT_MOD_CORE, "Failed to parse paramters!");
         return ret;
     }
 
@@ -152,7 +161,7 @@ int32_t main(int argc, char *argv[])
     ret = gt_daemonize_process();
     if (GT_OK != ret)
     {
-        GT_ERROR_LOG(GT_MID_CORE, "Failed to daemonize process!");
+        GT_ERROR_LOG(GT_MOD_CORE, "Failed to daemonize process!");
         return ret;
     }
 
@@ -160,7 +169,7 @@ int32_t main(int argc, char *argv[])
     ret = gt_init_system();
     if (GT_OK != ret)
     {
-        GT_ERROR_LOG(GT_MID_CORE, "Failed to init process!");
+        GT_ERROR_LOG(GT_MOD_CORE, "Failed to init process!");
         return ret;
     }
 
@@ -168,7 +177,7 @@ int32_t main(int argc, char *argv[])
     ret = gt_do_run();
     if (GT_OK != ret)
     {
-        GT_ERROR_LOG(GT_MID_CORE, "Failed to do-run!");
+        GT_ERROR_LOG(GT_MOD_CORE, "Failed to do-run!");
         return ret;
     }
 

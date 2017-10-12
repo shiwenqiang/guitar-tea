@@ -58,13 +58,36 @@ void * gt_pthread_routine(void * args)
     while (1)
     {
         sleep(1);
-        GT_INFO_LOG(GT_MID_CORE, "This is %s, [thread:%lu, pid:%d]", gt_pthread->pthread_name, gt_pthread->pthread_id, gt_pthread->pid);
+        GT_INFO_LOG(GT_MOD_CORE, "This is %s, [thread:%lu, pid:%d]", gt_pthread->pthread_name, gt_pthread->pthread_id, gt_pthread->pid);
+    }
+}
+
+void * gt_pthread_routine1(void * args)
+{
+    //int32_t ret = 0;
+    gt_pthread_t *gt_pthread = (gt_pthread_t *)args;
+    if (NULL == gt_pthread)
+    {
+        pthread_exit(NULL);
+    }
+
+    gt_pthread->pid = syscall(__NR_gettid);
+    prctl(PR_SET_NAME, gt_pthread->pthread_name);
+
+    pthread_mutex_lock(&gt_pthread_mutex);
+    pthread_cond_wait(&gt_pthread_cond, &gt_pthread_mutex);
+    pthread_mutex_unlock(&gt_pthread_mutex);
+
+    while (1)
+    {
+        sleep(1);
+        GT_INFO_LOG(GT_MOD_CORE, "This is %s, [thread:%lu, pid:%d]", gt_pthread->pthread_name, gt_pthread->pthread_id, gt_pthread->pid);
     }
 }
 
 gt_pthread_t g_gt_pthread[GT_PTHREAD_NUM] = {
     {0, "gt_pthread_0", gt_pthread_routine, 0},
-    {0, "gt_pthread_1", gt_pthread_routine, 0},
+    {0, "gt_pthread_1", gt_pthread_routine1, 0},
     {0, "gt_pthread_2", gt_pthread_routine, 0},
     {0, "gt_pthread_3", gt_pthread_routine, 0},
     {0, "gt_pthread_4", gt_pthread_routine, 0}
@@ -77,14 +100,14 @@ int32_t gt_create_pthread(void)
     ret = pthread_mutex_init(&gt_pthread_mutex, NULL);
     if (GT_OK != ret)
     {
-        GT_ERROR_LOG(GT_MID_CORE, "Failed to init mutex!");
+        GT_ERROR_LOG(GT_MOD_CORE, "Failed to init mutex!");
         return ret;
     }
 
     ret = pthread_cond_init(&gt_pthread_cond, NULL);
     if (GT_OK != ret)
     {
-        GT_ERROR_LOG(GT_MID_CORE, "Failed to init cond!");
+        GT_ERROR_LOG(GT_MOD_CORE, "Failed to init cond!");
         return ret;
     }
 
@@ -94,7 +117,7 @@ int32_t gt_create_pthread(void)
         if (GT_OK != ret)
         {
             int32_t errnum = errno;
-            GT_ERROR_LOG(GT_MID_CORE, "Failed create pthread[%d]. errno:%d, %s", i, errnum, strerror(errnum));
+            GT_ERROR_LOG(GT_MOD_CORE, "Failed create pthread[%d]. errno:%d, %s", i, errnum, strerror(errnum));
             return GT_ERROR;
         }
     }
@@ -107,7 +130,7 @@ int32_t gt_wakeup_pthread(void)
     if (GT_OK != ret)
     {
         int32_t errnum = errno;
-        GT_ERROR_LOG(GT_MID_CORE, "Failed wakeup all pthread. errno:%d, %s", errnum, strerror(errnum));
+        GT_ERROR_LOG(GT_MOD_CORE, "Failed wakeup all pthread. errno:%d, %s", errnum, strerror(errnum));
         return ret;
     }
     return GT_OK;
