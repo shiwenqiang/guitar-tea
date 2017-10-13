@@ -18,6 +18,8 @@
 /* The necessary header files */
 #include <signal.h>
 
+#define GT_BACKTRACE_BUF_SIZE (100)
+
 typedef enum gt_sig
 {
     GT_SIGHUP   = SIGHUP,       /* User */
@@ -61,6 +63,6 @@ typedef enum gt_sig
 typedef void (*sa_handler_fn) (int32_t sig);
 
 /* Declare Funcions */
-extern int32_t gt_signals_register(void);
+extern int32_t gt_signals_init(void);
 
 #endif

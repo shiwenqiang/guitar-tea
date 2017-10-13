@@ -16,6 +16,7 @@
 #include "public.h"
 #include "gt_pub.h"
 #include "gt_log.h"
+#include "gt_core.h"
 #include "gt_signal.h"
 #include "gt_worker.h"
 #include "gt_memory.h"
@@ -104,13 +105,36 @@ int32_t gt_init_system(void)
     int ret = 0;
     /* Memory */
     /* Logging */
-    /* Signal */
-    ret = gt_signals_register();
+    ret = gt_log_init();
     if (GT_OK != ret)
     {
-        GT_ERROR_LOG(GT_MOD_CORE, "Failed to register signals!");
+        GT_ERROR_LOG(GT_MOD_CORE, "Failed to init log!");
         return ret;
     }
+    /* Signal */
+    ret = gt_signals_init();
+    if (GT_OK != ret)
+    {
+        GT_ERROR_LOG(GT_MOD_CORE, "Failed to init signals!");
+        return ret;
+    }
+
+    /* Core */
+    ret = gt_core_init();
+    if (GT_OK != ret)
+    {
+        GT_ERROR_LOG(GT_MOD_CORE, "Failed to init poller.");
+        return ret;
+    }
+
+    /* Sys-Phase */
+    ret = gt_phase_run();
+    if (GT_OK != ret)
+    {
+        GT_ERROR_LOG(GT_MOD_CORE, "Failed to run phase!");
+        return ret;
+    }
+
     /* pthread */
     ret = gt_create_pthread();
     if (GT_OK != ret)

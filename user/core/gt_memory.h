@@ -24,6 +24,6 @@ typedef enum gt_mem_type
 }gt_mem_type_e;
 
 extern void *gt_malloc_mem(gt_mod_type_e mod, gt_mem_type_e mtype, int64_t size);
-extern int32_t gt_free_mem(gt_mod_type_e mod, gt_mem_type_e mtype, void *mem);
+extern void gt_free_mem(void *mem);
 
 #endif /* __GT_MEMORY_H__ */
