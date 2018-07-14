@@ -26,11 +26,6 @@ char *g_log_level_str[GT_LOG_LEVEL_MAX] = {
 };
 
 
-#if 0
-struct tm *localtime_r(const time_t *timep, struct tm *result);
-int snprintf(char *str, size_t size, const char *format, ...);
-int vsnprintf(char *str, size_t size, const char *format, va_list ap);
-#endif
 void gt_log_print(gt_mod_type_e mod, int32_t stdfd_flag, int32_t log_level, const char *format, ...)
 {
     int32_t fd;
@@ -100,20 +95,20 @@ void gt_log_print(gt_mod_type_e mod, int32_t stdfd_flag, int32_t log_level, cons
         return;
     }
 
-    sync();
+    //sync();
     return;
 }
 
 int32_t gt_log_init(void)
 {
-#if 1
-    g_gt_log_fd = open(GT_LOG_FILE_PATH""GT_LOG_FILE_NAME, O_CREAT|O_RDWR, 0666);
+    g_gt_log_fd = open(GT_LOG_FILE_PATH""GT_LOG_FILE_NAME, O_CREAT|O_APPEND|O_RDWR, 0666);
     if (0 > g_gt_log_fd)
     {
         int32_t errnum = errno;
         GT_STD_ERROR_LOG(GT_MOD_CORE, "Failed to open log-file: %s%s! errno:%d, %s", GT_LOG_FILE_PATH, GT_LOG_FILE_NAME, errnum, strerror(errnum));
         return GT_ERROR;
     }
-#endif
+
     return GT_OK;
 }
+

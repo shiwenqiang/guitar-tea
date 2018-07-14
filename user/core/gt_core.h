@@ -46,6 +46,6 @@ typedef struct gt_phase_info
 
 extern int32_t gt_core_init(void);
 extern int32_t gt_phase_run(void);
-extern int32_t gt_phase_register(gt_mod_type_e gmod, gt_phase_e gphase, phase_fn fn);
+extern int32_t gt_phase_register(gt_cmod_e cmod, gt_phase_e gphase, phase_fn fn);
 
 #endif /* __GT_CORE_H__ */

@@ -16,7 +16,9 @@
 #define __GT_WORKER_H__
 
 /* Define Macro */
-#define GT_PTHREAD_NUM (5)
+#define GT_DATANET_PTHREAD_NUM (4)
+#define GT_BUSINESS_PTHREAD_NUM (5)
+
 #define _GNU_SOURCE
 /* Define Structure */
 typedef void *(*routine_fn)(void *arg);
@@ -26,6 +28,8 @@ typedef struct gt_pthread
     char *pthread_name;
     routine_fn pthread_routine;
     pid_t pid;
+    void *data;
+    //struct gt_poller gpoller;
 }gt_pthread_t;
 
 /* Declare Function Prototype */
@@ -34,4 +38,6 @@ extern int32_t gt_wakeup_pthread(void);
 
 extern pid_t gt_get_pthread_pid(void);
 extern pthread_t gt_get_pthread_id(void);
+
+extern int32_t gt_create_datanet_pthread(void);
 #endif /* __GT_WORKER_H__ */

@@ -63,8 +63,10 @@ typedef uint32_t            gt_uint_t;
 #define GT_OK               (0)
 #define GT_ERROR            (-1)
 
-#define DIM(__arr)  (sizeof(__arr)/sizeof(__arr[0]))
+#define DIM(__arr)  (sizeof(__arr)/sizeof(__arr[0])) //__arr must be a array, not a pointer!
 
+#define likely(x)  __builtin_expect(!!(x), 1)
+#define unlikely(x)    __builtin_expect(!!(x), 0)
 /* Structure Define Section */
 
 /* Prototype Declare Section */

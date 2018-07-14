@@ -38,6 +38,7 @@ int32_t gt_poller_event_start(int32_t eflag, struct gt_event *gevent)
     }
 
     gevent->e.events |= eflag;
+    gevent->e.data.ptr = gevent;
     ret = epoll_ctl(gpoller->epfd, op, gevent->efd, &gevent->e);
     if (GT_OK != ret)
     {
@@ -109,6 +110,7 @@ int32_t gt_poller_init(int32_t maxe, int32_t timeout, struct gt_poller *gpoller)
 {
     //int ret = GT_OK;
     gpoller->maxe = maxe;
+    gpoller->timeout = timeout;
     gpoller->epfd = epoll_create(maxe + 1);
     if (0 > gpoller->epfd)
     {
@@ -117,8 +119,8 @@ int32_t gt_poller_init(int32_t maxe, int32_t timeout, struct gt_poller *gpoller)
         return GT_ERROR;
     }
 
-    gpoller->events = (struct epoll_event *)gt_malloc_mem(GT_MOD_CORE, GT_MEM_TYPE_HEAP, (maxe * sizeof(struct epoll_event)));
-    if (NULL == gpoller->events)
+    gpoller->ee = (struct epoll_event *)gt_malloc_mem(GT_MOD_CORE, GT_MEM_TYPE_HEAP, (maxe * sizeof(struct epoll_event)));
+    if (NULL == gpoller->ee)
     {
         GT_ERROR_LOG(GT_MOD_CORE, "Failed to alloc mem for gpoller.");
         return GT_ERROR;
@@ -137,5 +139,31 @@ void gt_poller_clean(struct gt_poller *gpoller)
 
     close(gpoller->epfd);
 
-    gt_free_mem(gpoller->events);
+    gt_free_mem(gpoller->ee);
+}
+
+void gt_poller_epoll_wait(struct gt_poller *gpoller)
+{
+    int32_t ret = GT_OK;
+    int events_num = epoll_wait(gpoller->epfd, gpoller->ee,
+                                gpoller->maxe, gpoller->timeout);
+    if (0 < events_num)
+    {
+        for (int32_t i = 0; i < events_num; i++)
+        {
+            struct gt_event *ge = (struct gt_event *)gpoller->ee[i].data.ptr;
+            if ( gpoller->ee[i].events & EPOLLIN )
+            {
+                ret = ge->ops.read(ge);
+                if (ret < 0)
+                {
+                    GT_ERROR_LOG(GT_MOD_CORE, "Failed to read for efd:%d", ge->efd);
+                }
+            }
+            else if( gpoller->ee[i].events & EPOLLOUT )
+            {
+                ret = ge->ops.write(ge);
+            }
+        }
+    }
 }

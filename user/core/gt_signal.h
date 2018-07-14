@@ -18,7 +18,7 @@
 /* The necessary header files */
 #include <signal.h>
 
-#define GT_BACKTRACE_BUF_SIZE (100)
+#define GT_BACKTRACE_BUF_SIZE (128)
 
 typedef enum gt_sig
 {
@@ -28,7 +28,7 @@ typedef enum gt_sig
     GT_SIGILL   = SIGILL,       /* Core */
     GT_SIGTRAP  = SIGTRAP,      /* Default */
     GT_SIGABRT  = SIGABRT,      /* Core */
-    GT_SIGIOT   = SIGIOT,       /* Ignore */
+    //GT_SIGIOT   = SIGIOT,     /* Ignore as SIGABRT*/
     GT_SIGBUS   = SIGBUS,       /* Core */
     GT_SIGFPE   = SIGFPE,       /* Core */
     GT_SIGKILL  = SIGKILL,      /* Default */
@@ -52,11 +52,11 @@ typedef enum gt_sig
     GT_SIGVTALRM = SIGVTALRM,   /* Ignore */
     GT_SIGPROF  = SIGPROF,      /* Ignore */
     GT_SIGWINCH = SIGWINCH,     /* Ignore */
-    GT_SIGPOLL  = SIGPOLL,      /* Ignore */
+    //GT_SIGPOLL  = SIGPOLL,    /* Ignore as SIGIO */
     GT_SIGIO    = SIGIO,        /* Ignore */
     GT_SIGPWR   = SIGPWR,       /* Ignore */
     GT_SIGSYS   = SIGSYS,       /* Core */
-    GT_SIGUNUSED = SIGUNUSED,   /* Ignore */
+    //GT_SIGUNUSED = SIGUNUSED, /* Ignore as SIGSYS */ 
 }gt_sig_e;
 
 /* Declare Function-pointer's Prototype */

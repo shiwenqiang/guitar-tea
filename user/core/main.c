@@ -20,6 +20,8 @@
 #include "gt_signal.h"
 #include "gt_worker.h"
 #include "gt_memory.h"
+#include "gt_poller.h"
+#include "gt_network.h"
 
 /* STDLIBC INCLUDE */
 #include <stdio.h>
@@ -126,20 +128,28 @@ int32_t gt_init_system(void)
         GT_ERROR_LOG(GT_MOD_CORE, "Failed to init poller.");
         return ret;
     }
-
-    /* Sys-Phase */
-    ret = gt_phase_run();
+    /* network */
+    ret = gt_network_init();
     if (GT_OK != ret)
     {
-        GT_ERROR_LOG(GT_MOD_CORE, "Failed to run phase!");
+        GT_ERROR_LOG(GT_MOD_CORE, "Failed to init network.");
         return ret;
     }
+
 
     /* pthread */
     ret = gt_create_pthread();
     if (GT_OK != ret)
     {
         GT_ERROR_LOG(GT_MOD_CORE, "Failed to create pthread!");
+        return ret;
+    }
+
+    /* Sys-Phase */
+    ret = gt_phase_run();
+    if (GT_OK != ret)
+    {
+        GT_ERROR_LOG(GT_MOD_CORE, "Failed to run phase!");
         return ret;
     }
 
@@ -156,15 +166,18 @@ int32_t gt_init_system(void)
     return GT_OK;
 }
 
+extern struct gt_poller g_gt_core_poller;
+
 int32_t gt_do_run(void)
 {
-    pid_t pid = gt_get_pthread_pid();
-    pthread_t tid = gt_get_pthread_id();
+    //pid_t pid = gt_get_pthread_pid();
+    //pthread_t tid = gt_get_pthread_id();
+
     prctl(PR_SET_NAME, "gt_pthread_main");
     while(1)
     {
-        sleep(1);
-        GT_INFO_LOG(GT_MOD_CORE, "This is main, [pthread:%lu, pid:%d]", tid, pid);
+        gt_poller_epoll_wait(&g_gt_core_poller);
+        //GT_INFO_LOG(GT_MOD_CORE, "This is main, [pthread:%lu, pid:%d]", tid, pid);
     }
 
     return GT_OK;
