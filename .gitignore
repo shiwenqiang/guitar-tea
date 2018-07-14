@@ -28,6 +28,7 @@ obj/*
 *.out
 *.d
 *.o
+*.e
 
 # TRACE
 !*.c
