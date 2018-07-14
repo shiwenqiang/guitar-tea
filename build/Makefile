@@ -17,7 +17,7 @@
 #	Define compiler
 CC = gcc
 
-CFLAGS = -g -Wall -pthread
+CFLAGS = -gstabs+ -Wall -pthread -rdynamic -ldl
 
 CURRENT_PATH = $(shell pwd)
 RESERVED_PATH = /
@@ -55,7 +55,7 @@ gt: $(objects)
 
 #------------------------------------------------
 #	Include dependence file *.d
-include $(dependence)
+-include $(dependence)
 
 #	Define func of generate dependence-relationship file *.d
 define gen_dep
