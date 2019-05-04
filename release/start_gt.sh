@@ -4,7 +4,7 @@ echo "Start GT domain..."
 
 cd ../build/bin/
 
-./gt 192.168.1.102 5555 > /dev/null 2>&1
+./gt 192.168.1.105 5555 > /dev/null 2>&1
 result=$?
 
 if [ $result -ne 0 ] ; then
