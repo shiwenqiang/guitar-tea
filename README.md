@@ -4,12 +4,14 @@ guitar&tea(abbr. gt) is a flexible high-performance server programming framework
 ## Compile
 ```sh
 cd build/
+cmake ..
 make
+make install
 ```
 
 ## Run
 ```sh
-cd build/bin/
-./gt [ip] [port]
+cd build/src/
+./gt_main [ip] [port]
 ```
 
