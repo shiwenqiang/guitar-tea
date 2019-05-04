@@ -10,7 +10,8 @@
 #               FOLDER                 #
 ########################################
 # IGNORE
-
+build/
+.vscode/
 # TRACE
 
 
@@ -18,21 +19,17 @@
 #               FILE                   #
 ########################################
 
-# IGNORE
-bin/*
-dep/*
-obj/*
-
+#===============IGNORE==================
 *.data
 *.gch
 *.out
 *.d
 *.o
 *.e
+*.*~
+# FOR GTAGS
+GPATH
+GRTAGS
+GTAGS
+#================TRACE==================
 
-# TRACE
-!*.c
-!*.cpp
-!*.h
-!Makefile
-!.gitignore
