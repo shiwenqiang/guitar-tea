@@ -30,13 +30,13 @@ typedef struct gt_spinlock {
 #ifdef __SSE2__
 #include <xmmintrin.h>
 STATIC INLINE
-void gt_pause(void)
-{
-    _mm_pause();
-}
+#define GT_PAUSE() \
+do { \
+    _mm_pause(); \
+}while (0)
 #else
 STATIC INLINE
-void gt_pause(void) {}
+#define GT_PAUSE()
 #endif
 
 STATIC INLINE
@@ -50,7 +50,7 @@ void gt_spinlock_lock(gt_spinlock_t *spl)
 {
     while(!__sync_bool_compare_and_swap(&spl->locked, 0, 1))
     {
-        gt_pause();
+        GT_PAUSE();
     }
 }
 
