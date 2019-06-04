@@ -50,10 +50,7 @@ void gt_spinlock_lock(gt_spinlock_t *spl)
 {
     while(!__sync_bool_compare_and_swap(&spl->locked, 0, 1))
     {
-        while(spl->locked)
-        {
-            gt_pause();
-        }
+        gt_pause();
     }
 }
 
