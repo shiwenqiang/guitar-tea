@@ -15,29 +15,44 @@
 #ifndef __GT_SPINLOCK_H__
 #define __GT_SPINLOCK_H__
 
+#include "gt_pub.h"
+
 typedef struct gt_spinlock {
     volatile int locked;
 }gt_spinlock_t;
 
-#ifdef __STATIC_INLINE__
-#define STATIC static
-#define INLINE inline
-#else
-#define STATIC
-#define INLINE
-#endif //__STATIC_INLINE__
-
 #ifdef __SSE2__
 #include <xmmintrin.h>
-STATIC INLINE
 #define GT_PAUSE() \
 do { \
     _mm_pause(); \
 }while (0)
 #else
-STATIC INLINE
 #define GT_PAUSE()
 #endif
+
+STATIC INLINE
+void gt_spinlock_lock_with_val(gt_spinlock_t *spl, int val)
+{
+    do {
+        while (!__sync_bool_compare_and_swap(&spl->locked, 0, val)) {
+            GT_PAUSE();
+        }
+        break;
+    } while (1);
+}
+
+STATIC INLINE
+void gt_spinlock_unlock_with_val(gt_spinlock_t *spl, int val)
+{
+    do {
+        while (!__sync_bool_compare_and_swap(&spl->locked, val, 0)) {
+            GT_PAUSE();
+        }
+        break;
+    } while (1);
+}
+
 
 STATIC INLINE
 void gt_spinlock_init(gt_spinlock_t *spl)
@@ -66,5 +81,9 @@ bool gt_spinlock_trylock(gt_spinlock_t *spl)
 {
     return __sync_bool_compare_and_swap(&spl->locked, 0, 1);
 }
+
+#define GT_SPINLOCK_INIT(__p_spl) gt_spinlock_init(__p_spl)
+#define GT_SPINLOCK_LOCK(__p_spl) gt_spinlock_lock(__p_spl)
+#define GT_SPINLOCK_UNLOCK(__p_spl) gt_spinlock_unlock(__p_spl)
 
 #endif

@@ -19,10 +19,10 @@
 #include <unistd.h>
 #include <time.h>
 #include <sys/time.h>
-#include "../comm/gt_list.h"
-#include "../comm/gt_typedef.h"
-#include "../comm/gt_module.h"
-
+#include "gt_comm.h"
+#include "gt_list.h"
+#include "gt_typedef.h"
+#include "gt_module.h"
 
 extern int32_t gt_create_pipefd(int32_t pipefd[2]);
 extern int32_t gt_set_nonblock(int32_t fd);

@@ -30,9 +30,17 @@
 pthread_mutex_t gt_pthread_mutex;
 pthread_cond_t gt_pthread_cond;
 
-pid_t gt_get_pthread_pid(void)
+pid_t gt_gettid(void)
 {
-    return syscall(__NR_gettid);
+    static __thread pid_t cached_tid;
+    static __thread pid_t cached_pid;
+    pid_t pid = getpid();
+    if ((cached_pid != pid) || (cached_tid == 0))
+    {
+        cached_pid = pid;
+        cached_tid = syscall(__NR_gettid);
+    }
+    return cached_tid;
 }
 
 pthread_t gt_get_pthread_id(void)
