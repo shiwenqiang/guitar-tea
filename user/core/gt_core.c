@@ -19,6 +19,7 @@
 #include "gt_core.h"
 #include "gt_memory.h"
 #include "gt_poller.h"
+#include "gt_spinlock.h"
 
 /* STDLIBC INCLUDE */
 

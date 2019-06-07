@@ -17,7 +17,7 @@
 
 typedef struct gt_spinlock {
     volatile int locked;
-}gt_spinlock_t
+}gt_spinlock_t;
 
 #ifdef __STATIC_INLINE__
 #define STATIC static
@@ -57,13 +57,14 @@ void gt_spinlock_lock(gt_spinlock_t *spl)
 STATIC INLINE
 void gt_spinlock_unlock(gt_spinlock_t *spl)
 {
-    spl->locked = 0;
+    //spl->locked = 0;
+    __sync_lock_release(&spl->locked);
 }
 
 STATIC INLINE
 bool gt_spinlock_trylock(gt_spinlock_t *spl)
 {
-    return __sync_bool_compare_and_swap(&spl-locked, 0, 1);
+    return __sync_bool_compare_and_swap(&spl->locked, 0, 1);
 }
 
 #endif
