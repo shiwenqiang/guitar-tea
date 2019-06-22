@@ -16,6 +16,7 @@
 #define __GT_SPINLOCK_H__
 
 #include "gt_pub.h"
+#include <assert.h>
 
 typedef struct gt_spinlock {
     volatile int locked;
@@ -32,25 +33,15 @@ do { \
 #endif
 
 STATIC INLINE
-void gt_spinlock_lock_with_val(gt_spinlock_t *spl, int val)
+bool gt_spinlock_lock_with_val(gt_spinlock_t *spl, int val)
 {
-    do {
-        while (!__sync_bool_compare_and_swap(&spl->locked, 0, val)) {
-            GT_PAUSE();
-        }
-        break;
-    } while (1);
+    return __sync_bool_compare_and_swap(&spl->locked, 0, val);
 }
 
 STATIC INLINE
-void gt_spinlock_unlock_with_val(gt_spinlock_t *spl, int val)
+bool gt_spinlock_unlock_with_val(gt_spinlock_t *spl, int val)
 {
-    do {
-        while (!__sync_bool_compare_and_swap(&spl->locked, val, 0)) {
-            GT_PAUSE();
-        }
-        break;
-    } while (1);
+    return __sync_bool_compare_and_swap(&spl->locked, val, 0);
 }
 
 
@@ -72,7 +63,6 @@ void gt_spinlock_lock(gt_spinlock_t *spl)
 STATIC INLINE
 void gt_spinlock_unlock(gt_spinlock_t *spl)
 {
-    //spl->locked = 0;
     __sync_lock_release(&spl->locked);
 }
 
@@ -82,8 +72,34 @@ bool gt_spinlock_trylock(gt_spinlock_t *spl)
     return __sync_bool_compare_and_swap(&spl->locked, 0, 1);
 }
 
+STATIC INLINE
+void gt_spinlock_lock_with_pid(gt_spinlock_t *spl)
+{
+    pid_t pid = gt_gettid();
+    while (!gt_spinlock_lock_with_val(spl, (int)pid))
+    {
+        GT_PAUSE();
+    }
+}
+
+STATIC INLINE
+void gt_spinlock_unlock_with_pid(gt_spinlock_t *spl)
+{
+    pid_t pid = gt_gettid();
+    assert(spl->locked == (int)pid);
+    __sync_lock_release(&spl->locked);
+}
+
+STATIC INLINE
+bool gt_spinlock_trylock_with_pid(gt_spinlock_t *spl, pid_t pid)
+{
+    return gt_spinlock_lock_with_val(spl, (int)pid);
+}
+
 #define GT_SPINLOCK_INIT(__p_spl) gt_spinlock_init(__p_spl)
 #define GT_SPINLOCK_LOCK(__p_spl) gt_spinlock_lock(__p_spl)
 #define GT_SPINLOCK_UNLOCK(__p_spl) gt_spinlock_unlock(__p_spl)
+#define GT_SPINLOCK_LOCK_WITH_PID(__p_spl) gt_spinlock_lock_with_pid(__p_spl)
+#define GT_SPINLOCK_UNLOCK_WITH_PID(__p_spl) gt_spinlock_unlock_with_pid(__p_spl)
 
 #endif
